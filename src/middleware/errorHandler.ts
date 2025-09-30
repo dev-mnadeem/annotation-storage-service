@@ -13,11 +13,41 @@ export function notFoundHandler(req: Request, res: Response<ErrorBody>): void {
   });
 }
 
+/**
+ * body-parser rejects a request before any route runs, by throwing an error that carries its
+ * own 4xx status and a `type`. Without this mapping a truncated JSON body or an oversized RLE
+ * run list would be reported, and logged, as a defect in this service.
+ */
+const BODY_ERROR_CODES: Record<string, string> = {
+  'entity.parse.failed': 'invalid_json',
+  'entity.too.large': 'payload_too_large',
+  'encoding.unsupported': 'unsupported_encoding',
+  'charset.unsupported': 'unsupported_encoding',
+};
+
+function isBodyParserError(err: unknown): err is Error & { status: number; type: string } {
+  return (
+    err instanceof Error &&
+    'type' in err &&
+    typeof err.type === 'string' &&
+    'status' in err &&
+    typeof err.status === 'number' &&
+    err.status >= 400 &&
+    err.status < 500
+  );
+}
+
 function describe(err: unknown): { status: number; body: ErrorBody } {
   if (err instanceof ApiError) {
     return {
       status: err.status,
       body: { error: { code: err.code, message: err.message, details: err.details } },
+    };
+  }
+  if (isBodyParserError(err)) {
+    return {
+      status: err.status,
+      body: { error: { code: BODY_ERROR_CODES[err.type] ?? 'bad_request', message: err.message } },
     };
   }
   if (err instanceof ZodError) {

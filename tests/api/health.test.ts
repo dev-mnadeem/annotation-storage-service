@@ -49,3 +49,26 @@ describe('unknown routes', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('request bodies the JSON parser refuses', () => {
+  it('answers malformed JSON with a 400 rather than an internal error', async () => {
+    const res = await request(testApp())
+      .post('/api/projects')
+      .set('X-API-Key', ADMIN_KEY)
+      .set('Content-Type', 'application/json')
+      .send('{"name": "Road signs"');
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('invalid_json');
+  });
+
+  it('answers a body over the size cap with a 413', async () => {
+    const padding = 'x'.repeat(11 * 1024 * 1024);
+    const res = await request(testApp())
+      .post('/api/annotations')
+      .set('X-API-Key', ADMIN_KEY)
+      .set('Content-Type', 'application/json')
+      .send(JSON.stringify({ metadata: { padding } }));
+    expect(res.status).toBe(413);
+    expect(res.body.error.code).toBe('payload_too_large');
+  });
+});
