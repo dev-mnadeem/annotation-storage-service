@@ -1,7 +1,7 @@
 import mongoose, { Schema, type Document, type Types } from 'mongoose';
 import type { Segmentation } from '../domain/mask/types';
 
-export interface IAnnotation extends Document {
+export interface IAnnotation extends Document<Types.ObjectId> {
   project: Types.ObjectId;
   image: Types.ObjectId;
   label: string;

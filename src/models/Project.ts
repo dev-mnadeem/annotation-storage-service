@@ -3,7 +3,7 @@ import mongoose, { Schema, type Document, type Types } from 'mongoose';
 export const PROJECT_STATUSES = ['active', 'archived'] as const;
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
-export interface IProject extends Document {
+export interface IProject extends Document<Types.ObjectId> {
   name: string;
   description?: string;
   status: ProjectStatus;

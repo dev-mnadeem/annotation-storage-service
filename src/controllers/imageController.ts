@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import type { z } from 'zod';
-import { allowedActions, nextStatus, type ImageAction } from '../domain/imageLifecycle';
+import { allowedActions, nextStatus } from '../domain/imageLifecycle';
 import { rankByArea } from '../domain/ranking';
 import { ApiError } from '../lib/ApiError';
 import { listImageAnnotations } from '../store/annotations';
@@ -13,7 +13,7 @@ export async function createImagesForProject(req: Request, res: Response): Promi
   if (!project) throw ApiError.notFound('Project');
 
   const { images } = req.body as z.infer<typeof CreateImagesBody>;
-  const created = await insertImages(project._id as never, images);
+  const created = await insertImages(project._id, images);
   res.status(201).json({ inserted: created.length, images: created });
 }
 
@@ -33,7 +33,7 @@ export async function changeImageStatus(req: Request, res: Response): Promise<vo
   if (!image) throw ApiError.notFound('Image');
 
   const { action } = req.body as z.infer<typeof ImageActionBody>;
-  const target = nextStatus(image.status, action as ImageAction);
+  const target = nextStatus(image.status, action);
   if (!target) {
     throw ApiError.conflict(
       'illegal_transition',
@@ -42,7 +42,7 @@ export async function changeImageStatus(req: Request, res: Response): Promise<vo
     );
   }
 
-  const moved = await transitionImage(image._id as never, image.status, target);
+  const moved = await transitionImage(image._id, image.status, target);
   if (!moved) {
     throw ApiError.conflict('status_changed', 'the image status changed during this request');
   }
@@ -57,7 +57,7 @@ export async function getImageMasks(req: Request, res: Response): Promise<void> 
   const image = await findImage(req.params.id);
   if (!image) throw ApiError.notFound('Image');
 
-  const annotations = await listImageAnnotations(image._id as never);
+  const annotations = await listImageAnnotations(image._id);
   const ranked = rankByArea(annotations.map((a) => ({ area: a.area, annotation: a })));
 
   res.json({

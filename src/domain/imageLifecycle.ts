@@ -28,7 +28,3 @@ export function allowedActions(from: ImageStatus): ImageAction[] {
 export function nextStatus(from: ImageStatus, action: ImageAction): ImageStatus | null {
   return TRANSITIONS[from][action] ?? null;
 }
-
-export function isTerminalFor(status: ImageStatus, action: ImageAction): boolean {
-  return nextStatus(status, action) === status;
-}

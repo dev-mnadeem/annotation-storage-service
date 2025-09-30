@@ -15,13 +15,9 @@ export function encodeCursor(lastId: string): string {
   return Buffer.from(lastId, 'utf8').toString('base64url');
 }
 
+/** Base64url decoding never throws on bad input, so the id check is the whole validation. */
 export function decodeCursor(token: string): string {
-  let decoded: string;
-  try {
-    decoded = Buffer.from(token, 'base64url').toString('utf8');
-  } catch {
-    throw ApiError.badRequest('invalid_cursor', 'cursor is not a valid pagination token');
-  }
+  const decoded = Buffer.from(token, 'base64url').toString('utf8');
   if (!isValidObjectId(decoded)) {
     throw ApiError.badRequest('invalid_cursor', 'cursor is not a valid pagination token');
   }

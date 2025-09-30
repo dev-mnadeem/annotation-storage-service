@@ -1,9 +1,9 @@
-import mongoose, { Schema, type Document } from 'mongoose';
+import mongoose, { Schema, type Document, type Types } from 'mongoose';
 
 export const USER_ROLES = ['annotator', 'admin'] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
-export interface IUser extends Document {
+export interface IUser extends Document<Types.ObjectId> {
   name: string;
   email: string;
   role: UserRole;

@@ -1,7 +1,7 @@
 import mongoose, { Schema, type Document, type Types } from 'mongoose';
 import { IMAGE_STATUSES, type ImageStatus } from '../domain/imageLifecycle';
 
-export interface IImage extends Document {
+export interface IImage extends Document<Types.ObjectId> {
   project: Types.ObjectId;
   uri: string;
   width: number;

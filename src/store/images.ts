@@ -21,10 +21,6 @@ export function findImage(id: string): Promise<IImage | null> {
   return Image.findById(id).exec();
 }
 
-export function setImageStatus(id: Types.ObjectId, status: ImageStatus): Promise<unknown> {
-  return Image.updateOne({ _id: id }, { $set: { status } }).exec();
-}
-
 /**
  * Moves an image to `status` only if it is still in `from`. The compare-and-set is what keeps
  * two annotators finishing the same image from both believing they made the transition.

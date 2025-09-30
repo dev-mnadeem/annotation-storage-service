@@ -52,7 +52,7 @@ export function resolveActor(adminKey: string) {
     try {
       const user = await findByApiKey(presented);
       if (user) {
-        req.actor = { id: user._id as Types.ObjectId, role: user.role, name: user.name };
+        req.actor = { id: user._id, role: user.role, name: user.name };
       }
       next();
     } catch (err) {

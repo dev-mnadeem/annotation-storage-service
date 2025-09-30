@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express';
-import { Types } from 'mongoose';
 import { inspectMask } from '../domain/mask/checks';
 import { nextStatus } from '../domain/imageLifecycle';
 import { ApiError } from '../lib/ApiError';
@@ -48,7 +47,7 @@ export async function createAnnotation(req: Request, res: Response): Promise<voi
 
   const annotation = await insertAnnotation({
     project: image.project,
-    image: image._id as Types.ObjectId,
+    image: image._id,
     label: body.label,
     segmentation: body.segmentation,
     area: verdict.area,
@@ -59,7 +58,7 @@ export async function createAnnotation(req: Request, res: Response): Promise<voi
   // Accepting a mask advances the image, but only along an edge the lifecycle allows.
   const target = nextStatus(image.status, 'annotate');
   if (target && target !== image.status) {
-    await transitionImage(image._id as Types.ObjectId, image.status, target);
+    await transitionImage(image._id, image.status, target);
   }
 
   res.status(201).json(annotation);

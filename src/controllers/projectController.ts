@@ -54,8 +54,8 @@ export async function exportProject(req: Request, res: Response): Promise<void> 
   if (!project) throw ApiError.notFound('Project');
 
   const [images, annotations] = await Promise.all([
-    listProjectImages(project._id as never),
-    listProjectAnnotations(project._id as never),
+    listProjectImages(project._id),
+    listProjectAnnotations(project._id),
   ]);
 
   const dataset = buildCocoDataset({

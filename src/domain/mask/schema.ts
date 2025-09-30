@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { MIN_RING_VERTICES } from '../../config/constants';
-import type { Segmentation } from './types';
 
 const vertexZ = z.tuple([z.number().finite(), z.number().finite()]);
 const ringZ = z.array(vertexZ).min(MIN_RING_VERTICES);
@@ -23,9 +22,3 @@ export const RleSegmentationZ = z.object({
  * which needs the image dimensions that this schema cannot see.
  */
 export const SegmentationZ = z.discriminatedUnion('type', [PolygonSegmentationZ, RleSegmentationZ]);
-
-export type SegmentationInput = z.infer<typeof SegmentationZ>;
-
-export function parseSegmentation(input: unknown): Segmentation {
-  return SegmentationZ.parse(input) as Segmentation;
-}
