@@ -6,9 +6,12 @@ import { ApiError } from '../lib/ApiError';
 import { listImageAnnotations } from '../store/annotations';
 import { findImage, insertImages, transitionImage } from '../store/images';
 import { findProject } from '../store/projects';
-import type { CreateImagesBody, ImageActionBody } from '../validation/requests';
+import type { CreateImagesBody, ImageActionBody, IdParam } from '../validation/requests';
 
-export async function createImagesForProject(req: Request, res: Response): Promise<void> {
+export async function createImagesForProject(
+  req: Request<{ projectId: string }>,
+  res: Response,
+): Promise<void> {
   const project = await findProject(req.params.projectId);
   if (!project) throw ApiError.notFound('Project');
 
@@ -17,7 +20,7 @@ export async function createImagesForProject(req: Request, res: Response): Promi
   res.status(201).json({ inserted: created.length, images: created });
 }
 
-export async function getImage(req: Request, res: Response): Promise<void> {
+export async function getImage(req: Request<IdParam>, res: Response): Promise<void> {
   const image = await findImage(req.params.id);
   if (!image) throw ApiError.notFound('Image');
   res.json(image);
@@ -28,7 +31,7 @@ export async function getImage(req: Request, res: Response): Promise<void> {
  * table decides whether it is legal from the current status — so an unknown or out-of-order
  * action is a 409 rather than a silently accepted status write.
  */
-export async function changeImageStatus(req: Request, res: Response): Promise<void> {
+export async function changeImageStatus(req: Request<IdParam>, res: Response): Promise<void> {
   const image = await findImage(req.params.id);
   if (!image) throw ApiError.notFound('Image');
 
@@ -53,7 +56,7 @@ export async function changeImageStatus(req: Request, res: Response): Promise<vo
  * Every mask on an image with its area rank, in one request. Ranking each mask separately
  * through `/annotations/:id/rank` costs one round trip per mask for the same answer.
  */
-export async function getImageMasks(req: Request, res: Response): Promise<void> {
+export async function getImageMasks(req: Request<IdParam>, res: Response): Promise<void> {
   const image = await findImage(req.params.id);
   if (!image) throw ApiError.notFound('Image');
 

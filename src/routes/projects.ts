@@ -6,7 +6,6 @@ import {
   getProjectStats,
 } from '../controllers/projectController';
 import { createImagesForProject } from '../controllers/imageController';
-import { asyncHandler } from '../lib/asyncHandler';
 import { requireAdmin } from '../middleware/apiKey';
 import { validate } from '../middleware/validate';
 import {
@@ -18,16 +17,16 @@ import {
 
 const router = Router();
 
-router.post('/', requireAdmin, validate('body', CreateProjectBody), asyncHandler(createProject));
-router.get('/:id', validate('params', IdParams), asyncHandler(getProject));
-router.get('/:id/stats', validate('params', IdParams), asyncHandler(getProjectStats));
-router.get('/:id/export', validate('params', IdParams), asyncHandler(exportProject));
+router.post('/', requireAdmin, validate('body', CreateProjectBody), createProject);
+router.get('/:id', validate('params', IdParams), getProject);
+router.get('/:id/stats', validate('params', IdParams), getProjectStats);
+router.get('/:id/export', validate('params', IdParams), exportProject);
 router.post(
   '/:projectId/images',
   requireAdmin,
   validate('params', ProjectIdParams),
   validate('body', CreateImagesBody),
-  asyncHandler(createImagesForProject),
+  createImagesForProject,
 );
 
 export default router;

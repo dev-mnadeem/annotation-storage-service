@@ -6,7 +6,7 @@ import { listProjectAnnotations } from '../store/annotations';
 import { listProjectImages } from '../store/images';
 import { createProject as insertProject, findProject, projectCounts } from '../store/projects';
 import { findManyByIds } from '../store/users';
-import type { CreateProjectBody } from '../validation/requests';
+import type { CreateProjectBody, IdParam } from '../validation/requests';
 import type { z } from 'zod';
 
 export async function createProject(req: Request, res: Response): Promise<void> {
@@ -15,13 +15,13 @@ export async function createProject(req: Request, res: Response): Promise<void> 
   res.status(201).json(project);
 }
 
-export async function getProject(req: Request, res: Response): Promise<void> {
+export async function getProject(req: Request<IdParam>, res: Response): Promise<void> {
   const project = await findProject(req.params.id);
   if (!project) throw ApiError.notFound('Project');
   res.json(project);
 }
 
-export async function getProjectStats(req: Request, res: Response): Promise<void> {
+export async function getProjectStats(req: Request<IdParam>, res: Response): Promise<void> {
   const project = await findProject(req.params.id);
   if (!project) throw ApiError.notFound('Project');
 
@@ -49,7 +49,7 @@ export async function getProjectStats(req: Request, res: Response): Promise<void
  * deliberately unbounded read in the service: an export is a whole-project operation by
  * definition, and splitting it across pages would produce a file no consumer can parse.
  */
-export async function exportProject(req: Request, res: Response): Promise<void> {
+export async function exportProject(req: Request<IdParam>, res: Response): Promise<void> {
   const project = await findProject(req.params.id);
   if (!project) throw ApiError.notFound('Project');
 

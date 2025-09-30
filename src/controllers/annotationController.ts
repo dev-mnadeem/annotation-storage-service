@@ -11,7 +11,7 @@ import {
   pageAnnotations,
 } from '../store/annotations';
 import { findImage, transitionImage } from '../store/images';
-import type { AnnotationQueryInput, CreateAnnotationInput } from '../validation/requests';
+import type { AnnotationQueryInput, CreateAnnotationInput, IdParam } from '../validation/requests';
 
 /**
  * Storing a mask is three decisions in order: which image it belongs to, whether the geometry
@@ -64,7 +64,7 @@ export async function createAnnotation(req: Request, res: Response): Promise<voi
   res.status(201).json(annotation);
 }
 
-export async function getAnnotation(req: Request, res: Response): Promise<void> {
+export async function getAnnotation(req: Request<IdParam>, res: Response): Promise<void> {
   const annotation = await findAnnotation(req.params.id);
   if (!annotation) throw ApiError.notFound('Annotation');
   res.json(annotation);
@@ -84,7 +84,7 @@ export async function queryAnnotations(req: Request, res: Response): Promise<voi
   });
 }
 
-export async function getAnnotationRank(req: Request, res: Response): Promise<void> {
+export async function getAnnotationRank(req: Request<IdParam>, res: Response): Promise<void> {
   const annotation = await findAnnotation(req.params.id);
   if (!annotation) throw ApiError.notFound('Annotation');
 

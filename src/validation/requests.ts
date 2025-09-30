@@ -73,3 +73,6 @@ export const CreateUserBody = z
 
 export type CreateAnnotationInput = z.infer<typeof CreateAnnotationBody>;
 export type AnnotationQueryInput = z.infer<typeof AnnotationQuery>;
+
+/** Route params after `validate('params', IdParams)` has run. */
+export type IdParam = z.infer<typeof IdParams>;

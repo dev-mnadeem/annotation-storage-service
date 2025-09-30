@@ -29,7 +29,14 @@ function toRoute(entry: PostmanRequest): string {
 
 const requests = flatten(collection.item);
 const documented = new Set(requests.map(toRoute));
-const registered = new Set(registeredRoutes(testApp()).map((r) => r.replace(/:[A-Za-z]+/g, ':x')));
+const segments = [
+  ...new Set(
+    [...documented].flatMap((r) => r.split(' ')[1].split('/')).filter((s) => /^[a-z]+$/.test(s)),
+  ),
+];
+const registered = new Set(
+  registeredRoutes(testApp(), segments).map((r) => r.replace(/:[A-Za-z]+/g, ':x')),
+);
 
 /**
  * The collection is the only client-facing description of the API, so it is checked against
