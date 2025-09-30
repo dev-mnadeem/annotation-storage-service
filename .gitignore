@@ -1,0 +1,25 @@
+# dependencies and build output
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# test and tool output
+coverage/
+.vitest/
+.eslintcache
+.cache/
+tmp/
+logs/
+*.log
+npm-debug.log*
+
+# environment: only the example is tracked
+.env
+.env.*
+!.env.example
+
+# local environments and editors
+project_venv/
+.DS_Store
+.github/
