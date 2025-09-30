@@ -41,7 +41,7 @@ out of every query that does not ask for it by name.
 | `uri` | string | required — an S3 or CDN path, not the pixels |
 | `width` | number | required, at least 1 |
 | `height` | number | required, at least 1 |
-| `status` | `unassigned` \| `in_progress` \| `annotated` | defaults to `unassigned` |
+| `status` | `unassigned` \| `in_progress` \| `annotated` | always `unassigned` on import |
 | `assignedTo` | ObjectId(User) | optional |
 | `metadata` | object | free-form |
 
@@ -92,7 +92,8 @@ Polygon — a multi-polygon where `rings[0]` is the outline and any further ring
 ```
 
 Area is the shoelace area of each outline minus the shoelace area of its holes, floored at
-zero, summed over the polygons.
+zero, summed over the polygons. That subtraction is why every hole vertex must lie inside or on
+its outline: the `hole-containment` check rejects a mask where one does not.
 
 RLE — COCO-style run-length encoding, `size` as `[height, width]`, `counts` alternating
 background and foreground runs starting with background:

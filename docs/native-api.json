@@ -1,83 +1,197 @@
 {
-  "mode": "native disposable database; fixture data only",
+  "mode": "docker compose stack (mongo:7), demo data only; the issued annotator key is replaced with a placeholder",
   "exchanges": [
     {
+      "request": "GET /api/health",
+      "status": 200,
+      "response": {
+        "status": "ok",
+        "uptimeSeconds": 17,
+        "db": {
+          "state": "connected"
+        }
+      }
+    },
+    {
+      "request": "POST /api/users",
+      "body": {
+        "name": "Demo Annotator",
+        "email": "annotator@example.com"
+      },
+      "status": 201,
+      "response": {
+        "id": "6aef785f448a629ffd9bd931",
+        "name": "Demo Annotator",
+        "email": "annotator@example.com",
+        "role": "annotator",
+        "apiKey": "<shown-once-annotator-key>"
+      }
+    },
+    {
       "request": "POST /api/projects",
+      "body": {
+        "name": "Road signs",
+        "description": "Street-level frames"
+      },
       "status": 201,
       "response": {
         "name": "Road signs",
+        "description": "Street-level frames",
         "status": "active",
         "createdBy": null,
-        "_id": "6ae208e01dc831aa1278ac4e",
-        "createdAt": "2026-10-28T14:38:24.673Z",
-        "updatedAt": "2026-10-28T14:38:24.673Z",
+        "_id": "6aef785f448a629ffd9bd932",
+        "createdAt": "2026-11-07T19:13:35.216Z",
+        "updatedAt": "2026-11-07T19:13:35.216Z",
         "__v": 0
       }
     },
     {
-      "request": "POST /api/projects/6ae208e01dc831aa1278ac4e/images",
-      "status": 201,
-      "response": {
-        "inserted": 1,
+      "request": "POST /api/projects/6aef785f448a629ffd9bd932/images",
+      "body": {
         "images": [
           {
-            "project": "6ae208e01dc831aa1278ac4e",
-            "uri": "s3://demo/frame.png",
-            "width": 200,
-            "height": 100,
+            "uri": "s3://demo-frames/frame-0001.png",
+            "width": 1920,
+            "height": 1080
+          },
+          {
+            "uri": "s3://demo-frames/frame-0002.png",
+            "width": 1920,
+            "height": 1080
+          }
+        ]
+      },
+      "status": 201,
+      "response": {
+        "inserted": 2,
+        "images": [
+          {
+            "project": "6aef785f448a629ffd9bd932",
+            "uri": "s3://demo-frames/frame-0001.png",
+            "width": 1920,
+            "height": 1080,
             "status": "unassigned",
-            "_id": "6ae208e01dc831aa1278ac5b",
+            "_id": "6aef785f448a629ffd9bd933",
             "__v": 0,
-            "createdAt": "2026-10-28T14:38:24.841Z",
-            "updatedAt": "2026-10-28T14:38:24.841Z"
+            "createdAt": "2026-11-07T19:13:35.229Z",
+            "updatedAt": "2026-11-07T19:13:35.229Z"
+          },
+          {
+            "project": "6aef785f448a629ffd9bd932",
+            "uri": "s3://demo-frames/frame-0002.png",
+            "width": 1920,
+            "height": 1080,
+            "status": "unassigned",
+            "_id": "6aef785f448a629ffd9bd934",
+            "__v": 0,
+            "createdAt": "2026-11-07T19:13:35.229Z",
+            "updatedAt": "2026-11-07T19:13:35.229Z"
           }
         ]
       }
     },
     {
       "request": "POST /api/annotations",
-      "status": 201,
-      "response": {
-        "project": "6ae208e01dc831aa1278ac4e",
-        "image": "6ae208e01dc831aa1278ac5b",
-        "label": "sign",
+      "body": {
+        "image": "6aef785f448a629ffd9bd933",
+        "label": "stop-sign",
         "segmentation": {
           "type": "polygon",
           "polygons": [
             {
               "rings": [
                 [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    10,
-                    0
-                  ],
-                  [
-                    10,
-                    10
-                  ],
-                  [
-                    0,
-                    10
-                  ]
+                  [100, 100],
+                  [300, 100],
+                  [300, 300],
+                  [100, 300]
+                ],
+                [
+                  [150, 150],
+                  [200, 150],
+                  [200, 200],
+                  [150, 200]
                 ]
               ]
             }
           ]
         },
-        "area": 100,
-        "createdBy": null,
-        "_id": "6ae208e01dc831aa1278ac5f",
-        "createdAt": "2026-10-28T14:38:24.847Z",
-        "updatedAt": "2026-10-28T14:38:24.847Z",
+        "area": 37500
+      },
+      "status": 201,
+      "response": {
+        "project": "6aef785f448a629ffd9bd932",
+        "image": "6aef785f448a629ffd9bd933",
+        "label": "stop-sign",
+        "segmentation": {
+          "type": "polygon",
+          "polygons": [
+            {
+              "rings": [
+                [
+                  [100, 100],
+                  [300, 100],
+                  [300, 300],
+                  [100, 300]
+                ],
+                [
+                  [150, 150],
+                  [200, 150],
+                  [200, 200],
+                  [150, 200]
+                ]
+              ]
+            }
+          ]
+        },
+        "area": 37500,
+        "createdBy": "6aef785f448a629ffd9bd931",
+        "_id": "6aef785f448a629ffd9bd935",
+        "createdAt": "2026-11-07T19:13:35.241Z",
+        "updatedAt": "2026-11-07T19:13:35.241Z",
         "__v": 0
       }
     },
     {
       "request": "POST /api/annotations",
+      "body": {
+        "image": "6aef785f448a629ffd9bd933",
+        "label": "road",
+        "segmentation": {
+          "type": "rle",
+          "size": [1080, 1920],
+          "counts": [1036800, 1036800]
+        }
+      },
+      "status": 201,
+      "response": {
+        "project": "6aef785f448a629ffd9bd932",
+        "image": "6aef785f448a629ffd9bd933",
+        "label": "road",
+        "segmentation": {
+          "type": "rle",
+          "size": [1080, 1920],
+          "counts": [1036800, 1036800]
+        },
+        "area": 1036800,
+        "createdBy": "6aef785f448a629ffd9bd931",
+        "_id": "6aef785f448a629ffd9bd936",
+        "createdAt": "2026-11-07T19:13:35.253Z",
+        "updatedAt": "2026-11-07T19:13:35.253Z",
+        "__v": 0
+      }
+    },
+    {
+      "request": "POST /api/annotations",
+      "body": {
+        "image": "6aef785f448a629ffd9bd933",
+        "label": "road",
+        "segmentation": {
+          "type": "rle",
+          "size": [1080, 1920],
+          "counts": [10, 20]
+        }
+      },
       "status": 400,
       "response": {
         "error": {
@@ -87,9 +201,358 @@
             {
               "check": "rle-coverage",
               "code": "rle_counts_incomplete",
-              "message": "RLE counts sum to 30 pixels but the 100x200 frame has 20000"
+              "message": "RLE counts sum to 30 pixels but the 1080x1920 frame has 2073600"
             }
           ]
+        }
+      }
+    },
+    {
+      "request": "POST /api/annotations",
+      "body": {
+        "image": "6aef785f448a629ffd9bd933",
+        "label": "stop-sign",
+        "segmentation": {
+          "type": "polygon",
+          "polygons": [
+            {
+              "rings": [
+                [
+                  [1900, 100],
+                  [1950, 100],
+                  [1950, 150],
+                  [1900, 150]
+                ],
+                [
+                  [400, 0],
+                  [420, 0],
+                  [420, 20],
+                  [400, 20]
+                ]
+              ]
+            }
+          ]
+        }
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "mask_rejected",
+          "message": "the mask is not valid for this image",
+          "details": [
+            {
+              "check": "polygon-bounds",
+              "code": "polygon_out_of_bounds",
+              "message": "vertex (1950, 100) falls outside the 1920x1080 image"
+            },
+            {
+              "check": "hole-containment",
+              "code": "hole_outside_outline",
+              "message": "hole 1 of polygon 1 has vertex (400, 0) outside its outline"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "request": "POST /api/annotations",
+      "body": {
+        "image": "6aef785f448a629ffd9bd933",
+        "label": "stop-sign",
+        "segmentation": {
+          "type": "polygon",
+          "polygons": [
+            {
+              "rings": [
+                [
+                  [0, 0],
+                  [10, 0],
+                  [10, 10],
+                  [0, 10]
+                ]
+              ]
+            }
+          ]
+        },
+        "createdBy": "6aba5879eeabc09de713e310"
+      },
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "validation_failed",
+          "message": "Invalid request body",
+          "details": [
+            {
+              "path": "",
+              "message": "Unrecognized key: \"createdBy\""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "request": "GET /api/annotations?limit=1&imageId=6aef785f448a629ffd9bd933",
+      "status": 200,
+      "response": {
+        "limit": 1,
+        "items": [
+          {
+            "_id": "6aef785f448a629ffd9bd936",
+            "project": "6aef785f448a629ffd9bd932",
+            "image": "6aef785f448a629ffd9bd933",
+            "label": "road",
+            "segmentation": {
+              "type": "rle",
+              "size": [1080, 1920],
+              "counts": [1036800, 1036800]
+            },
+            "area": 1036800,
+            "createdBy": "6aef785f448a629ffd9bd931",
+            "createdAt": "2026-11-07T19:13:35.253Z",
+            "updatedAt": "2026-11-07T19:13:35.253Z",
+            "__v": 0
+          }
+        ],
+        "nextCursor": "NmFlZjc4NWY0NDhhNjI5ZmZkOWJkOTM2"
+      }
+    },
+    {
+      "request": "GET /api/annotations?limit=1&imageId=6aef785f448a629ffd9bd933&cursor=NmFlZjc4NWY0NDhhNjI5ZmZkOWJkOTM2",
+      "status": 200,
+      "response": {
+        "limit": 1,
+        "items": [
+          {
+            "_id": "6aef785f448a629ffd9bd935",
+            "project": "6aef785f448a629ffd9bd932",
+            "image": "6aef785f448a629ffd9bd933",
+            "label": "stop-sign",
+            "segmentation": {
+              "type": "polygon",
+              "polygons": [
+                {
+                  "rings": [
+                    [
+                      [100, 100],
+                      [300, 100],
+                      [300, 300],
+                      [100, 300]
+                    ],
+                    [
+                      [150, 150],
+                      [200, 150],
+                      [200, 200],
+                      [150, 200]
+                    ]
+                  ]
+                }
+              ]
+            },
+            "area": 37500,
+            "createdBy": "6aef785f448a629ffd9bd931",
+            "createdAt": "2026-11-07T19:13:35.241Z",
+            "updatedAt": "2026-11-07T19:13:35.241Z",
+            "__v": 0
+          }
+        ],
+        "nextCursor": null
+      }
+    },
+    {
+      "request": "GET /api/annotations/6aef785f448a629ffd9bd935/rank",
+      "status": 200,
+      "response": {
+        "annotationId": "6aef785f448a629ffd9bd935",
+        "imageId": "6aef785f448a629ffd9bd933",
+        "area": 37500,
+        "rank": 2,
+        "total": 2
+      }
+    },
+    {
+      "request": "GET /api/images/6aef785f448a629ffd9bd933/masks",
+      "status": 200,
+      "response": {
+        "imageId": "6aef785f448a629ffd9bd933",
+        "total": 2,
+        "masks": [
+          {
+            "id": "6aef785f448a629ffd9bd936",
+            "label": "road",
+            "area": 1036800,
+            "rank": 1,
+            "createdBy": "6aef785f448a629ffd9bd931"
+          },
+          {
+            "id": "6aef785f448a629ffd9bd935",
+            "label": "stop-sign",
+            "area": 37500,
+            "rank": 2,
+            "createdBy": "6aef785f448a629ffd9bd931"
+          }
+        ]
+      }
+    },
+    {
+      "request": "PATCH /api/images/6aef785f448a629ffd9bd933/status",
+      "body": {
+        "action": "release"
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "illegal_transition",
+          "message": "cannot release an image that is annotated",
+          "details": {
+            "from": "annotated",
+            "allowed": ["reopen"]
+          }
+        }
+      }
+    },
+    {
+      "request": "PATCH /api/images/6aef785f448a629ffd9bd933/status",
+      "body": {
+        "action": "reopen"
+      },
+      "status": 200,
+      "response": {
+        "id": "6aef785f448a629ffd9bd933",
+        "from": "annotated",
+        "to": "in_progress"
+      }
+    },
+    {
+      "request": "GET /api/projects/6aef785f448a629ffd9bd932/stats",
+      "status": 200,
+      "response": {
+        "projectId": "6aef785f448a629ffd9bd932",
+        "images": 2,
+        "annotations": 2,
+        "perLabel": [
+          {
+            "label": "road",
+            "count": 1
+          },
+          {
+            "label": "stop-sign",
+            "count": 1
+          }
+        ],
+        "perAnnotator": [
+          {
+            "annotator": "6aef785f448a629ffd9bd931",
+            "count": 2,
+            "user": {
+              "name": "Demo Annotator",
+              "email": "annotator@example.com"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "request": "GET /api/projects/6aef785f448a629ffd9bd932/export",
+      "status": 200,
+      "response": {
+        "info": {
+          "description": "Road signs",
+          "project": "6aef785f448a629ffd9bd932",
+          "exported_count": 2
+        },
+        "images": [
+          {
+            "id": "6aef785f448a629ffd9bd933",
+            "file_name": "s3://demo-frames/frame-0001.png",
+            "width": 1920,
+            "height": 1080
+          },
+          {
+            "id": "6aef785f448a629ffd9bd934",
+            "file_name": "s3://demo-frames/frame-0002.png",
+            "width": 1920,
+            "height": 1080
+          }
+        ],
+        "categories": [
+          {
+            "id": 1,
+            "name": "road",
+            "supercategory": "object"
+          },
+          {
+            "id": 2,
+            "name": "stop-sign",
+            "supercategory": "object"
+          }
+        ],
+        "annotations": [
+          {
+            "id": "6aef785f448a629ffd9bd935",
+            "image_id": "6aef785f448a629ffd9bd933",
+            "category_id": 2,
+            "segmentation": {
+              "type": "polygon",
+              "polygons": [
+                {
+                  "rings": [
+                    [
+                      [100, 100],
+                      [300, 100],
+                      [300, 300],
+                      [100, 300]
+                    ],
+                    [
+                      [150, 150],
+                      [200, 150],
+                      [200, 200],
+                      [150, 200]
+                    ]
+                  ]
+                }
+              ]
+            },
+            "area": 37500,
+            "bbox": [100, 100, 200, 200],
+            "iscrowd": 0
+          },
+          {
+            "id": "6aef785f448a629ffd9bd936",
+            "image_id": "6aef785f448a629ffd9bd933",
+            "category_id": 1,
+            "segmentation": {
+              "type": "rle",
+              "size": [1080, 1920],
+              "counts": [1036800, 1036800]
+            },
+            "area": 1036800,
+            "bbox": [0, 0, 1920, 1080],
+            "iscrowd": 1
+          }
+        ]
+      }
+    },
+    {
+      "request": "POST /api/projects",
+      "body": {
+        "name": "x"
+      },
+      "status": 403,
+      "response": {
+        "error": {
+          "code": "forbidden",
+          "message": "This action requires the admin role"
+        }
+      }
+    },
+    {
+      "request": "POST /api/projects",
+      "body": "{\"name\": \"Road",
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "invalid_json",
+          "message": "Unterminated string in JSON at position 14 (line 1 column 15)"
         }
       }
     }
