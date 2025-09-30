@@ -76,6 +76,77 @@ describe('polygon checks', () => {
     expect(codes(seg)).toContain('empty_mask');
   });
 
+  const withHole = (hole: number[][]): Segmentation => ({
+    type: 'polygon',
+    polygons: [
+      {
+        rings: [
+          [
+            [0, 0],
+            [100, 0],
+            [100, 80],
+            [0, 80],
+          ],
+          hole as [number, number][],
+        ],
+      },
+    ],
+  });
+
+  it('accepts a hole inside its outline', () => {
+    const verdict = inspectMask(
+      withHole([
+        [10, 10],
+        [30, 10],
+        [30, 30],
+        [10, 30],
+      ]),
+      frame,
+    );
+    expect(verdict.violations).toEqual([]);
+    expect(verdict.area).toBe(8000 - 400);
+  });
+
+  it('accepts a hole that shares an edge with its outline', () => {
+    expect(
+      codes(
+        withHole([
+          [0, 0],
+          [20, 0],
+          [20, 20],
+          [0, 20],
+        ]),
+      ),
+    ).toEqual([]);
+  });
+
+  it('rejects a hole drawn beside the outline instead of inside it', () => {
+    const verdict = inspectMask(
+      withHole([
+        [120, 10],
+        [140, 10],
+        [140, 30],
+        [120, 30],
+      ]),
+      frame,
+    );
+    expect(verdict.violations.map((v) => v.code)).toEqual(['hole_outside_outline']);
+    expect(verdict.violations[0].message).toContain('(120, 10)');
+  });
+
+  it('rejects a hole that straddles the outline', () => {
+    expect(
+      codes(
+        withHole([
+          [90, 10],
+          [110, 10],
+          [110, 30],
+          [90, 30],
+        ]),
+      ),
+    ).toContain('hole_outside_outline');
+  });
+
   it('accepts a mask that touches the image border exactly', () => {
     expect(codes(box(200, 100))).toEqual([]);
   });

@@ -1,5 +1,12 @@
 import { MIN_RING_VERTICES } from '../../config/constants';
-import type { BBox, PolygonSegmentation, RLESegmentation, Ring, Segmentation } from './types';
+import type {
+  BBox,
+  PolygonSegmentation,
+  RLESegmentation,
+  Ring,
+  Segmentation,
+  Vertex,
+} from './types';
 
 /**
  * Shoelace area of a ring, unsigned. Winding order is not meaningful here: callers subtract
@@ -77,4 +84,31 @@ export function boundingBox(seg: Segmentation): BBox {
 /** Every vertex of a polygon mask, flattened — used by the bounds check and by COCO export. */
 export function vertices(seg: PolygonSegmentation): Ring {
   return seg.polygons.flatMap((poly) => poly.rings.flat());
+}
+
+function onSegment([px, py]: Vertex, [ax, ay]: Vertex, [bx, by]: Vertex): boolean {
+  const cross = (bx - ax) * (py - ay) - (by - ay) * (px - ax);
+  if (cross !== 0) return false;
+  return (
+    px >= Math.min(ax, bx) &&
+    px <= Math.max(ax, bx) &&
+    py >= Math.min(ay, by) &&
+    py <= Math.max(ay, by)
+  );
+}
+
+/**
+ * Even-odd ray cast, with a point on the ring's edge counted as inside: a hole that shares an
+ * edge with its outline is still a hole in it.
+ */
+export function pointInRing(point: Vertex, ring: Ring): boolean {
+  const [px, py] = point;
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    if (onSegment(point, ring[j], ring[i])) return true;
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
 }

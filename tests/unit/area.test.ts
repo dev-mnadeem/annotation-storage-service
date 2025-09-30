@@ -4,6 +4,7 @@ import {
   computePolygonArea,
   computeRleArea,
   computeSegmentationArea,
+  pointInRing,
   ringArea,
   rleCoverage,
 } from '../../src/domain/mask/area';
@@ -125,5 +126,37 @@ describe('computeSegmentationArea', () => {
       }),
     ).toBe(9);
     expect(computeSegmentationArea({ type: 'rle', size: [2, 2], counts: [1, 3] })).toBe(3);
+  });
+});
+
+describe('pointInRing', () => {
+  const ring = square(10) as [number, number][];
+  // An L shape: the notch at the top right is outside even though it is inside the bounds.
+  const ell: [number, number][] = [
+    [0, 0],
+    [10, 0],
+    [10, 4],
+    [4, 4],
+    [4, 10],
+    [0, 10],
+  ];
+
+  it('finds a point strictly inside', () => {
+    expect(pointInRing([5, 5], ring)).toBe(true);
+  });
+
+  it('counts a point on an edge or a corner as inside', () => {
+    expect(pointInRing([10, 5], ring)).toBe(true);
+    expect(pointInRing([0, 0], ring)).toBe(true);
+  });
+
+  it('rejects a point outside', () => {
+    expect(pointInRing([11, 5], ring)).toBe(false);
+    expect(pointInRing([-1, -1], ring)).toBe(false);
+  });
+
+  it('rejects a point in the notch of a concave ring', () => {
+    expect(pointInRing([7, 7], ell)).toBe(false);
+    expect(pointInRing([2, 7], ell)).toBe(true);
   });
 });

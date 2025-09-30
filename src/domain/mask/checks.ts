@@ -1,5 +1,5 @@
 import { AREA_EPSILON, MIN_RING_VERTICES } from '../../config/constants';
-import { computeSegmentationArea, ringArea, rleCoverage, vertices } from './area';
+import { computeSegmentationArea, pointInRing, ringArea, rleCoverage, vertices } from './area';
 import type { ImageFrame, Segmentation } from './types';
 
 /** What a check is handed. Everything it needs is here — checks do no I/O and have no state. */
@@ -112,6 +112,33 @@ export const RingShapeCheck: MaskCheck = {
   },
 };
 
+/**
+ * Area is the outline minus its holes, which is only true when each hole sits inside the
+ * outline. A hole drawn beside the shape, or straddling its edge, would otherwise subtract
+ * pixels the mask never covered and store an area that is quietly too small.
+ */
+export const HoleContainmentCheck: MaskCheck = {
+  id: 'hole-containment',
+  appliesTo: (seg) => seg.type === 'polygon',
+  run(ctx) {
+    if (ctx.segmentation.type !== 'polygon') return null;
+    for (const [p, poly] of ctx.segmentation.polygons.entries()) {
+      const [outline, ...holes] = poly.rings;
+      for (const [h, hole] of holes.entries()) {
+        const stray = hole.find((vertex) => !pointInRing(vertex, outline));
+        if (stray) {
+          return violation(
+            this,
+            'hole_outside_outline',
+            `hole ${h + 1} of polygon ${p + 1} has vertex (${stray[0]}, ${stray[1]}) outside its outline`,
+          );
+        }
+      }
+    }
+    return null;
+  },
+};
+
 /** Holes that cancel the outline, or an empty run list, both land here. */
 export const PositiveAreaCheck: MaskCheck = {
   id: 'positive-area',
@@ -165,6 +192,7 @@ export const MASK_CHECKS: readonly MaskCheck[] = [
   RleCoverageCheck,
   PolygonBoundsCheck,
   RingShapeCheck,
+  HoleContainmentCheck,
   PositiveAreaCheck,
   AreaWithinFrameCheck,
   DeclaredAreaCheck,
