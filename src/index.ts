@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import { existsSync } from 'fs';
 import http from 'http';
 import { createApp } from './app';
 import { connectDb, disconnectDb } from './config/db';
@@ -6,6 +6,8 @@ import { SHUTDOWN_GRACE_SECONDS } from './config/constants';
 import { env } from './config/env';
 
 async function main(): Promise<void> {
+  // Node reads .env itself; in a container the variables come from the environment instead.
+  if (existsSync('.env')) process.loadEnvFile('.env');
   const config = env();
 
   // Connect before listening. A process that accepts traffic it cannot serve turns one
