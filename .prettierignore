@@ -4,4 +4,4 @@ coverage
 package-lock.json
 # Markdown is hand-wrapped: the embedded JSON blocks are verbatim responses.
 *.md
-.postman
+postman

@@ -1,0 +1,849 @@
+{
+  "info": {
+    "name": "Perle AI Segmentation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "One request per route plus rejected cases. Set adminKey to your ADMIN_API_KEY and run the folders in order; ids and the annotator key are captured as you go."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7331/api"
+    },
+    {
+      "key": "adminKey",
+      "value": "replace-with-your-ADMIN_API_KEY"
+    },
+    {
+      "key": "annotatorKey",
+      "value": ""
+    },
+    {
+      "key": "projectId",
+      "value": ""
+    },
+    {
+      "key": "imageId",
+      "value": ""
+    },
+    {
+      "key": "annotationId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Issue an annotator key",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('annotatorKey', pm.response.json().apiKey);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo Annotator\",\n  \"email\": \"annotator@example.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create a project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('projectId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Road signs\",\n  \"description\": \"Street-level frames\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Import images",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('imageId', pm.response.json().images[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{adminKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/images",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "images"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"images\": [\n    {\n      \"uri\": \"s3://demo-frames/frame-0001.png\",\n      \"width\": 1920,\n      \"height\": 1080\n    }\n  ]\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Annotations",
+      "item": [
+        {
+          "name": "Store a polygon mask",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('annotationId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{imageId}}\",\n  \"label\": \"stop-sign\",\n  \"segmentation\": {\n    \"type\": \"polygon\",\n    \"polygons\": [\n      {\n        \"rings\": [\n          [\n            [\n              100,\n              100\n            ],\n            [\n              300,\n              100\n            ],\n            [\n              300,\n              300\n            ],\n            [\n              100,\n              300\n            ]\n          ],\n          [\n            [\n              150,\n              150\n            ],\n            [\n              200,\n              150\n            ],\n            [\n              200,\n              200\n            ],\n            [\n              150,\n              200\n            ]\n          ]\n        ]\n      }\n    ]\n  },\n  \"area\": 37500\n}"
+            }
+          }
+        },
+        {
+          "name": "Store an RLE mask",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{imageId}}\",\n  \"label\": \"road\",\n  \"segmentation\": {\n    \"type\": \"rle\",\n    \"size\": [\n      1080,\n      1920\n    ],\n    \"counts\": [\n      1036800,\n      1036800\n    ]\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "List annotations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations?limit=20&imageId={{imageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "imageId",
+                  "value": "{{imageId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get one annotation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations/{{annotationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations",
+                "{{annotationId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Area rank of one annotation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations/{{annotationId}}/rank",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations",
+                "{{annotationId}}",
+                "rank"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "item": [
+        {
+          "name": "Get an image",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/images/{{imageId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "images",
+                "{{imageId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Every mask on an image, ranked",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/images/{{imageId}}/masks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "images",
+                "{{imageId}}",
+                "masks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reopen an annotated image",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/images/{{imageId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "images",
+                "{{imageId}}",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"reopen\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Get a project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Project stats",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "stats"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Export as COCO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects/{{projectId}}/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects",
+                "{{projectId}}",
+                "export"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rejected requests",
+      "item": [
+        {
+          "name": "Vertex outside the frame",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{imageId}}\",\n  \"label\": \"stop-sign\",\n  \"segmentation\": {\n    \"type\": \"polygon\",\n    \"polygons\": [\n      {\n        \"rings\": [\n          [\n            [\n              1900,\n              100\n            ],\n            [\n              1950,\n              100\n            ],\n            [\n              1950,\n              150\n            ],\n            [\n              1900,\n              150\n            ]\n          ]\n        ]\n      }\n    ]\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "RLE that does not cover the frame",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{imageId}}\",\n  \"label\": \"road\",\n  \"segmentation\": {\n    \"type\": \"rle\",\n    \"size\": [\n      1080,\n      1920\n    ],\n    \"counts\": [\n      10,\n      20\n    ]\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Declared area disagrees",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{imageId}}\",\n  \"label\": \"stop-sign\",\n  \"segmentation\": {\n    \"type\": \"polygon\",\n    \"polygons\": [\n      {\n        \"rings\": [\n          [\n            [\n              0,\n              0\n            ],\n            [\n              10,\n              0\n            ],\n            [\n              10,\n              10\n            ],\n            [\n              0,\n              10\n            ]\n          ]\n        ]\n      }\n    ]\n  },\n  \"area\": 120\n}"
+            }
+          }
+        },
+        {
+          "name": "Hole outside its outline",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{imageId}}\",\n  \"label\": \"stop-sign\",\n  \"segmentation\": {\n    \"type\": \"polygon\",\n    \"polygons\": [\n      {\n        \"rings\": [\n          [\n            [\n              0,\n              0\n            ],\n            [\n              100,\n              0\n            ],\n            [\n              100,\n              100\n            ],\n            [\n              0,\n              100\n            ]\n          ],\n          [\n            [\n              200,\n              0\n            ],\n            [\n              220,\n              0\n            ],\n            [\n              220,\n              20\n            ],\n            [\n              200,\n              20\n            ]\n          ]\n        ]\n      }\n    ]\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Annotator tries to create a project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{annotatorKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Not allowed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Unknown API key",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "not-a-real-key"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/annotations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "annotations"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -11,7 +11,7 @@ interface PostmanRequest {
 }
 
 const collection = JSON.parse(
-  readFileSync(join(__dirname, '../../.postman/PerleAI.postman_collection.json'), 'utf8'),
+  readFileSync(join(__dirname, '../../postman/PerleAI.postman_collection.json'), 'utf8'),
 ) as { item: PostmanRequest[]; variable: { key: string; value: string }[] };
 
 function flatten(items: PostmanRequest[]): PostmanRequest[] {
