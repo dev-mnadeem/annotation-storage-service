@@ -1,0 +1,49 @@
+{
+  "name": "perleai-segmentation-api",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Storage and integrity checking for image segmentation masks",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "mongoose": "^8.6.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.11.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.7",
+    "@types/node": "^22.7.4",
+    "@types/supertest": "^6.0.2",
+    "eslint": "^9.11.0",
+    "eslint-config-prettier": "^9.1.0",
+    "mongodb-memory-server": "^10.1.2",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.7.0",
+    "vitest": "^2.1.1"
+  }
+}
