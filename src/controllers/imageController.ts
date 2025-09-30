@@ -46,7 +46,7 @@ export async function changeImageStatus(req: Request, res: Response): Promise<vo
   if (!moved) {
     throw ApiError.conflict('status_changed', 'the image status changed during this request');
   }
-  res.json({ id: image.id, from: image.status, to: target });
+  res.json({ id: String(image._id), from: image.status, to: target });
 }
 
 /**
@@ -61,10 +61,10 @@ export async function getImageMasks(req: Request, res: Response): Promise<void> 
   const ranked = rankByArea(annotations.map((a) => ({ area: a.area, annotation: a })));
 
   res.json({
-    imageId: image.id,
+    imageId: String(image._id),
     total: annotations.length,
     masks: ranked.map(({ item, rank }) => ({
-      id: item.annotation.id,
+      id: String(item.annotation._id),
       label: item.annotation.label,
       area: item.area,
       rank,

@@ -12,7 +12,7 @@ export async function createUserAccount(req: Request, res: Response): Promise<vo
   const body = req.body as z.infer<typeof CreateUserBody>;
   const { user, apiKey } = await createUser(body);
   res.status(201).json({
-    id: user.id,
+    id: String(user._id),
     name: user.name,
     email: user.email,
     role: user.role,

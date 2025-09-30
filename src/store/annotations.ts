@@ -1,4 +1,4 @@
-import { Types, type FilterQuery } from 'mongoose';
+import { Types, type QueryFilter } from 'mongoose';
 import { DEFAULT_PAGE_SIZE } from '../config/constants';
 import type { Segmentation } from '../domain/mask/types';
 import { Annotation, type IAnnotation } from '../models/Annotation';
@@ -10,8 +10,8 @@ export interface AnnotationFilter {
   projectId?: string;
 }
 
-function toQuery(filter: AnnotationFilter): FilterQuery<IAnnotation> {
-  const query: FilterQuery<IAnnotation> = {};
+function toQuery(filter: AnnotationFilter): QueryFilter<IAnnotation> {
+  const query: QueryFilter<IAnnotation> = {};
   if (filter.label) query.label = filter.label;
   if (filter.annotator) query.createdBy = new Types.ObjectId(filter.annotator);
   if (filter.imageId) query.image = new Types.ObjectId(filter.imageId);

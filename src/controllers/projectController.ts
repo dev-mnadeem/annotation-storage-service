@@ -27,12 +27,12 @@ export async function getProjectStats(req: Request, res: Response): Promise<void
 
   const counts = await projectCounts(req.params.id);
   const users = await findManyByIds(
-    counts.perAnnotator.map((row) => row.annotator).filter(Boolean),
+    counts.perAnnotator.flatMap((row) => (row.annotator ? [row.annotator] : [])),
   );
   const byId = new Map(users.map((u) => [String(u._id), { name: u.name, email: u.email }]));
 
   res.json({
-    projectId: project.id,
+    projectId: String(project._id),
     images: counts.images,
     annotations: counts.annotations,
     perLabel: counts.perLabel,
@@ -60,7 +60,7 @@ export async function exportProject(req: Request, res: Response): Promise<void> 
 
   const dataset = buildCocoDataset({
     projectName: project.name,
-    projectId: project.id,
+    projectId: String(project._id),
     images: images.map((img) => ({
       id: String(img._id),
       uri: img.uri,
@@ -76,6 +76,6 @@ export async function exportProject(req: Request, res: Response): Promise<void> 
     })),
   });
 
-  res.setHeader('Content-Disposition', `attachment; filename="coco-${project.id}.json"`);
+  res.setHeader('Content-Disposition', `attachment; filename="coco-${String(project._id)}.json"`);
   res.json(dataset);
 }

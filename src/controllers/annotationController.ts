@@ -90,7 +90,7 @@ export async function getAnnotationRank(req: Request, res: Response): Promise<vo
 
   const { rank, total } = await areaRank(annotation.image, annotation.area);
   res.json({
-    annotationId: annotation.id,
+    annotationId: String(annotation._id),
     imageId: String(annotation.image),
     area: annotation.area,
     rank,

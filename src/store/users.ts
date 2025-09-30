@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from 'crypto';
 import { API_KEY_BYTES } from '../config/constants';
+import { Types } from 'mongoose';
 import { User, type IUser, type UserRole } from '../models/User';
 
 /**
@@ -29,9 +30,9 @@ export function findByApiKey(key: string): Promise<IUser | null> {
   return User.findOne({ apiKeyHash: hashApiKey(key) }).exec();
 }
 
-export function findManyByIds(ids: unknown[]): Promise<IUser[]> {
+export function findManyByIds(ids: string[]): Promise<IUser[]> {
   if (!ids.length) return Promise.resolve([]);
-  return User.find({ _id: { $in: ids } })
+  return User.find({ _id: { $in: ids.map((id) => new Types.ObjectId(id)) } })
     .select('name email role')
     .exec();
 }
