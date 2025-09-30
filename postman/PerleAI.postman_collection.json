@@ -103,7 +103,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Demo Annotator\",\n  \"email\": \"annotator@example.com\"\n}"
+              "raw": "{\n  \"name\": \"Demo Annotator\",\n  \"email\": \"annotator+{{$timestamp}}@example.com\"\n}"
             }
           }
         },
