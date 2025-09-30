@@ -45,6 +45,15 @@ describe('POST /api/projects/:projectId/images', () => {
     expect(res.status).toBe(404);
   });
 
+  it('refuses to import an image straight into a later lifecycle status', async () => {
+    const project = await asAdmin(app).post('/api/projects').send({ name: 'Frames' });
+    const res = await asAdmin(app)
+      .post(`/api/projects/${project.body._id}/images`)
+      .send({ images: [{ uri: 's3://b/1.png', width: 640, height: 480, status: 'annotated' }] });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('validation_failed');
+  });
+
   it('rejects an empty batch', async () => {
     const project = await asAdmin(app).post('/api/projects').send({ name: 'Frames' });
     const res = await asAdmin(app)

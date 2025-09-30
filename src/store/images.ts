@@ -6,7 +6,6 @@ export interface NewImage {
   uri: string;
   width: number;
   height: number;
-  status?: ImageStatus;
   assignedTo?: string;
   metadata?: Record<string, unknown>;
 }

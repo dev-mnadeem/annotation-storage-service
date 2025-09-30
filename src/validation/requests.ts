@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '../config/constants';
 import { IMAGE_ACTIONS } from '../domain/imageLifecycle';
 import { SegmentationZ } from '../domain/mask/schema';
-import { IMAGE_STATUSES } from '../domain/imageLifecycle';
 import { USER_ROLES } from '../models/User';
 
 export const objectIdZ = z.string().refine(isValidObjectId, 'must be a 24-character ObjectId');
@@ -23,12 +22,15 @@ export const CreateProjectBody = z
   })
   .strict();
 
+/**
+ * No `status`: every imported image starts `unassigned` and only moves through the lifecycle
+ * table. Accepting one here let an import mark frames `annotated` with no mask behind them.
+ */
 const NewImageZ = z
   .object({
     uri: z.string().min(1),
     width: z.number().int().positive(),
     height: z.number().int().positive(),
-    status: z.enum(IMAGE_STATUSES).optional(),
     assignedTo: objectIdZ.optional(),
     metadata: z.record(z.string(), z.unknown()).optional(),
   })
