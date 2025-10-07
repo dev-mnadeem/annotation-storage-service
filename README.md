@@ -242,3 +242,12 @@ agree with whatever the code happens to do.
   nothing throttles a key that misbehaves.
 - **No RLE decoding.** Run lists are validated for coverage and summed for area, never
   expanded into a bitmap, so the bounding box of an RLE mask is reported as the whole frame.
+
+## A running API exchange
+
+![Accepted polygon and rejected incomplete mask](docs/screenshots/native-api.png)
+
+This capture displays responses from a native server backed by a disposable
+MongoDB: a polygon was saved with server-computed area 100, and an incomplete
+RLE mask was rejected with HTTP 400. The complete requests and responses are in
+[the exchange record](docs/native-api.json). The image URI is a synthetic fixture.

@@ -1,0 +1,97 @@
+{
+  "mode": "native disposable database; fixture data only",
+  "exchanges": [
+    {
+      "request": "POST /api/projects",
+      "status": 201,
+      "response": {
+        "name": "Road signs",
+        "status": "active",
+        "createdBy": null,
+        "_id": "6ae208e01dc831aa1278ac4e",
+        "createdAt": "2026-10-28T14:38:24.673Z",
+        "updatedAt": "2026-10-28T14:38:24.673Z",
+        "__v": 0
+      }
+    },
+    {
+      "request": "POST /api/projects/6ae208e01dc831aa1278ac4e/images",
+      "status": 201,
+      "response": {
+        "inserted": 1,
+        "images": [
+          {
+            "project": "6ae208e01dc831aa1278ac4e",
+            "uri": "s3://demo/frame.png",
+            "width": 200,
+            "height": 100,
+            "status": "unassigned",
+            "_id": "6ae208e01dc831aa1278ac5b",
+            "__v": 0,
+            "createdAt": "2026-10-28T14:38:24.841Z",
+            "updatedAt": "2026-10-28T14:38:24.841Z"
+          }
+        ]
+      }
+    },
+    {
+      "request": "POST /api/annotations",
+      "status": 201,
+      "response": {
+        "project": "6ae208e01dc831aa1278ac4e",
+        "image": "6ae208e01dc831aa1278ac5b",
+        "label": "sign",
+        "segmentation": {
+          "type": "polygon",
+          "polygons": [
+            {
+              "rings": [
+                [
+                  [
+                    0,
+                    0
+                  ],
+                  [
+                    10,
+                    0
+                  ],
+                  [
+                    10,
+                    10
+                  ],
+                  [
+                    0,
+                    10
+                  ]
+                ]
+              ]
+            }
+          ]
+        },
+        "area": 100,
+        "createdBy": null,
+        "_id": "6ae208e01dc831aa1278ac5f",
+        "createdAt": "2026-10-28T14:38:24.847Z",
+        "updatedAt": "2026-10-28T14:38:24.847Z",
+        "__v": 0
+      }
+    },
+    {
+      "request": "POST /api/annotations",
+      "status": 400,
+      "response": {
+        "error": {
+          "code": "mask_rejected",
+          "message": "the mask is not valid for this image",
+          "details": [
+            {
+              "check": "rle-coverage",
+              "code": "rle_counts_incomplete",
+              "message": "RLE counts sum to 30 pixels but the 100x200 frame has 20000"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
