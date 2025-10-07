@@ -251,3 +251,7 @@ This capture displays responses from a native server backed by a disposable
 MongoDB: a polygon was saved with server-computed area 100, and an incomplete
 RLE mask was rejected with HTTP 400. The complete requests and responses are in
 [the exchange record](docs/native-api.json). The image URI is a synthetic fixture.
+
+## Author
+
+[**Muhammad Nadeem**](https://github.com/dev-mnadeem)

@@ -39,6 +39,8 @@ export async function transitionImage(
   return result.modifiedCount === 1;
 }
 
-export function listProjectImages(projectId: Types.ObjectId): Promise<IImage[]> {
+type ImageSummary = Pick<IImage, 'uri' | 'width' | 'height'> & { _id: Types.ObjectId };
+
+export function listProjectImages(projectId: Types.ObjectId): Promise<ImageSummary[]> {
   return Image.find({ project: projectId }).select('uri width height').lean().exec();
 }

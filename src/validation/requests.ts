@@ -30,7 +30,7 @@ const NewImageZ = z
     height: z.number().int().positive(),
     status: z.enum(IMAGE_STATUSES).optional(),
     assignedTo: objectIdZ.optional(),
-    metadata: z.record(z.unknown()).optional(),
+    metadata: z.record(z.string(), z.unknown()).optional(),
   })
   .strict();
 
@@ -46,7 +46,7 @@ export const CreateAnnotationBody = z
     segmentation: SegmentationZ,
     /** Optional cross-check only. The stored area is always the one the server computes. */
     area: z.number().positive().optional(),
-    metadata: z.record(z.unknown()).optional(),
+    metadata: z.record(z.string(), z.unknown()).optional(),
   })
   .strict();
 
