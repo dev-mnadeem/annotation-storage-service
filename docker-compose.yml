@@ -1,0 +1,33 @@
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      # Published so the host can run `npm test` or a shell against the same data.
+      - '7332:27017'
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '7331:7331'
+    environment:
+      PORT: 7331
+      MONGODB_URI: mongodb://mongo:27017/perleai
+      # Override in a .env file next to this compose file before exposing anything.
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-local-development-admin-key}
+      REQUEST_LOG: combined
+    depends_on:
+      mongo:
+        # The API connects before it listens, so it must not start against a cold mongod.
+        condition: service_healthy
+
+volumes:
+  mongo-data:
